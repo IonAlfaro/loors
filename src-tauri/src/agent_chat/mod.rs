@@ -1162,6 +1162,7 @@ where
         image_paths: Vec::new(),
     }];
 
+    const LEGACY_TOOL_SUMMARY: &str = "[Herramientas ejecutadas en ese turno:";
     // Exclude the newly created empty assistant message at the end
     let prev_count = session.messages.len().saturating_sub(1);
     // Bound historical tool previews globally, favoring the most recent results.
@@ -1244,16 +1245,12 @@ where
             });
         } else {
             let mut txt = msg.content.clone();
+            // Older turns may already contain a copy of the internal summary.
+            while let Some(start) = txt.find(LEGACY_TOOL_SUMMARY) {
+                let end = txt[start..].find('\n').map_or(txt.len(), |offset| start + offset);
+                txt.replace_range(start..end, "");
+            }
             if !msg.tool_calls.is_empty() {
-                let summary_tools: Vec<String> = msg
-                    .tool_calls
-                    .iter()
-                    .map(|tc| format!("{}[{}]", tc.name, tc.status))
-                    .collect();
-                txt.push_str(&format!(
-                    "\n[Herramientas ejecutadas en ese turno: {}]",
-                    summary_tools.join(", ")
-                ));
                 for (call_idx, call) in msg.tool_calls.iter().enumerate() {
                     if let Some(preview) = historical_previews.get(&(idx, call_idx)) {
                         txt.push_str(&format!(
@@ -1615,6 +1612,7 @@ where
     // A turn is only completed after an explicit non-truncated final response.
     let mut execution = ExecutionState::new(max_steps);
     let mut plan_reminders = 0usize;
+    let mut retried_tool_summary = false;
     let mut command_verification = if resume_requested {
         session.execution_checkpoint.as_ref()
             .and_then(|checkpoint| checkpoint.get("commandVerification"))
@@ -1877,6 +1875,22 @@ where
         }
 
         if tool_calls.is_empty() {
+            if resp.content.contains(LEGACY_TOOL_SUMMARY) {
+                if _step < max_steps && !retried_tool_summary {
+                    retried_tool_summary = true;
+                    llm_messages.push(ChatMessage {
+                        role: "user".into(),
+                        content: Some("Responde a la pregunta original directamente con los resultados disponibles. Si no aportan datos suficientes, explica qué falta.".into()),
+                        tool_calls: None,
+                        tool_call_id: None,
+                        image_paths: Vec::new(),
+                    });
+                    continue;
+                }
+                execution.finish(TurnOutcome::Incomplete);
+                final_summary = "El modelo devolvió un resumen interno en lugar de responder.".into();
+                break;
+            }
             let truncated = resp.finish_reason.as_deref() == Some("length")
                 || resp.content.trim().is_empty();
             if truncated && _step < max_steps && repeat_count < 3 {
