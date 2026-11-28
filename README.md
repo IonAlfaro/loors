@@ -16,8 +16,10 @@
   </p>
 
   <p>
+    <a href="https://github.com/IonAlfaro/loors/releases/latest">Download</a> ·
     <a href="#features">Features</a> ·
     <a href="#screenshots">Screenshots</a> ·
+    <a href="#harness-templates">Templates</a> ·
     <a href="#headless-cli--web-server">Headless CLI &amp; Server</a> ·
     <a href="#installation">Installation</a> ·
     <a href="#architecture">Architecture</a> ·
@@ -33,13 +35,21 @@
   <img src="docs/screenshots/harness-studio.png" alt="Loors Visual Harness Studio" width="100%" />
 </p>
 
+## Get started
+
+1. Download the latest desktop installer from [GitHub Releases](https://github.com/IonAlfaro/loors/releases/latest).
+2. Choose a local GGUF model or connect an existing local or cloud API in Settings.
+3. Open **Agent Mode** to work with a project, or **Harness Studio** to build a repeatable workflow from a template or an empty canvas.
+
+Loors is designed for local-first operation. Cloud providers are optional; using external APIs or web tools may transmit data to those services. The project is source-available under FSL-1.1-MIT (see [License](#license)).
+
 ## Why Loors?
 
-Most AI tools force you to choose between a simple chat window and brittle CLI scripts — or lock you into a single cloud provider. **Loors** brings desktop polish, visual cyclic harnesses, an interactive shared browser, and a headless server binary together in a lightweight native stack (~4.4 MB desktop installer):
+Most AI tools force you to choose between a simple chat window and brittle CLI scripts — or lock you into a single cloud provider. **Loors** brings desktop polish, visual cyclic harnesses, an interactive shared browser, and a headless server binary together in a native Rust and Tauri stack:
 
-- **Agent Mode** — A clean, Codex/Cursor-inspired workspace with file tree, live Git diff, **interactive embedded browser**, subagents, live checklists, persistent artifacts, global MCP servers, 4-tier safety permissions, and live model-context usage.
-- **Visual Harness Studio** — Build repeatable, **cyclic** agent loops (e.g., *Coder → Tests → LLM Judge → Loop Guard → Human Gate → Done*) with `For Each` iterators, `JSON Validator`, global run budgets, *Run from here* resume, webhooks, cron, and Telegram triggers.
-- **AI Architect** — Built-in assistant that inspects your workspace and designs or refactors `.loors.json` harnesses for you.
+- **Agent Mode** — A clean, Codex/Cursor-inspired workspace with file tree, live Git diff, **interactive embedded browser**, subagents, live checklists, persistent artifacts, global MCP servers, 4-tier safety permissions, live model-context usage, structured task verification and bounded recovery.
+- **Visual Harness Studio** — Build repeatable, **cyclic** agent loops (e.g., *Coder → Tests → LLM Judge → Loop Guard → Human Gate → Done*) with `For Each` iterators, `JSON Validator`, JSON transformation, document generation, swarm coordination, global run budgets, *Run from here* resume, webhooks, cron, and Telegram triggers.
+- **AI Architect** — Built-in assistant that inspects your workspace and designs or refactors `.loors.json` harnesses for you, with safeguards around applying and saving workflow changes.
 - **Headless Agent, CLI & Self-Hosted Web Panel (`loors-cli`)** — Run an agent from a terminal, optionally in an isolated Git worktree, select a local inference backend and context size, then review the saved session in the desktop app. Also execute harnesses in CI/CD, cron, or SSH, or launch the web panel with Bearer token auth and SSE streaming.
 - **Local AI or Cloud APIs — Your Choice** — Run 100% private local GGUF models with 1-click `llama.cpp` GPU installation (CUDA, Vulkan, Metal, CPU), dynamic Hugging Face discovery, or connect OpenAI, Anthropic (Claude), Google Gemini, GitHub Models/Copilot, OpenRouter, LM Studio, Ollama, or any custom endpoint.
 
@@ -51,12 +61,23 @@ Most AI tools force you to choose between a simple chat window and brittle CLI s
 | :--- | :--- |
 | **Local Inference (`llama.cpp`)** | Automatic GPU detection (CUDA / Vulkan / Metal / CPU), 1-click runtime download, **dynamic Hugging Face GGUF explorer** (Trending, Most Downloaded, Most Liked, Most Recent), automatic LM Studio local model detection, custom `llama-server` binary support, KV-cache & context tuning, and live VRAM load/unload progress. |
 | **Cloud & Local API Providers** | Native streaming SSE for **OpenAI / ChatGPT**, **Anthropic / Claude** (including extended thinking & tool use), **Google Gemini**, **GitHub Models / Copilot**, **OpenRouter / OpenCode**, dedicated **LM Studio** (`:1234`) & **Ollama** (`:11434`) with selectable OpenAI/Anthropic compatibility & optional server secret, and custom endpoints. Automatic `/models` discovery + `${ENV_VAR}` secret expansion. |
-| **Autonomous Agent Mode** | 4-tier safety permissions (**Read-only**, **Ask**, **Auto** with AI safety reviewer, **Turbo**), isolated & parallel subagents, live todo checklist, background process manager, scheduled tasks, interactive user questions, persistent Markdown/HTML artifacts, global MCP servers, Thinking/Effort selector, and live context counter for local-model context tracking. |
+| **Autonomous Agent Mode** | 4-tier safety permissions (**Read-only**, **Ask**, **Auto** with AI safety reviewer, **Turbo**), isolated & parallel subagents, live todo checklist, background process manager, scheduled tasks, interactive user questions, persistent Markdown/HTML artifacts, global MCP servers, Thinking/Effort selector, live context counter for local-model context tracking, task reviews, persisted execution outcomes and configurable agent limits. |
 | **Interactive Embedded Browser** | Pure-Rust Chrome DevTools Protocol (CDP) browser with Chrome-style tabs, editable omnibox, direct click/type/scroll forwarding, and a persistent profile shared live between you and the AI Agent (log in manually and let the agent continue on the same authenticated page). Zero Node.js or Playwright dependencies. |
-| **Cyclic Visual Harnesses** | Drag-and-drop React Flow canvas with `Agent`, `Shell / Test`, `For Each / Iterator`, `JSON Validator`, `LLM Judge`, `Loop Guard`, `Human Gate`, `Git Checkpoint`, `Context Compactor`, `Knowledge / RAG`, `Memory / State`, `HTTP Request`, `Notify`, `Trigger` (Webhook / Cron / Telegram), `MCP Server`, `Skills`, `Parallel Fan-Out`, `Subgraph`, and `Custom Nodes` — plus global run budgets, per-node latency badges, 1-click resource wiring, and *Run from here* resume. |
+| **Cyclic Visual Harnesses** | Drag-and-drop React Flow canvas with `Agent`, `Shell / Test`, `For Each / Iterator`, `JSON Validator`, `Data Transform`, document creation and reading (Excel, CSV, Word, PDF), `Swarm`, `LLM Judge`, `Loop Guard`, `Human Gate`, `Git Checkpoint`, `Context Compactor`, `Knowledge / RAG`, `Memory / State`, `HTTP Request`, `Notify`, `Trigger` (Webhook / Cron / Telegram), `MCP Server`, `Skills`, `Parallel Fan-Out`, `Subgraph`, and `Custom Nodes` — plus global run budgets, per-node latency badges, 1-click resource wiring, undo/redo, template catalog, and *Run from here* resume. |
 | **Headless Agent, CLI & Web Server** | Dedicated `loors-cli` binary sharing 100% of the Rust engine: run an agent with a GGUF or cloud model, choose `--backend` and per-slot `--context`, optionally isolate changes in a Git worktree, and review the saved conversation in desktop Agent Mode. It also runs harnesses one-shot (`run --jsonl` / `--quiet`), hosts the React Web Panel over HTTP + SSE, and exposes run-control REST APIs. |
 
 ---
+
+## Agent execution and verification
+
+For multi-step software engineering tasks, Loors supports structured planning, task tracking, tool execution and review. The agent can work through ready tasks, run relevant checks and record their results before marking work complete. Independent task reviews, stagnation detection and bounded recovery attempts help it revisit unsuccessful approaches rather than repeat them indefinitely.
+
+- **Verification:** run checks after changes and distinguish observed test results from manual inspection. Permission denials and unsuccessful checks are treated as blockers rather than successful verification.
+- **Execution state:** session-scoped progress, active task, recovery phase and persisted execution outcomes help users understand where a run stopped.
+- **Configurable limits:** per-session limits for agent iterations, total model calls (including subagents and automated reviews), recovery attempts, identical results, reviews per task and verifier steps.
+- **Permissions:** select the appropriate permission mode for the workspace. Review tool requests and changes before approving operations that affect important files or systems.
+
+These mechanisms improve controllability; they do not guarantee that generated changes are correct. Review diffs and verification results before using them in production.
 
 ## Screenshots
 
@@ -79,6 +100,21 @@ Manage local GGUF models, dynamic Hugging Face downloads, MCP servers, `llama.cp
 </p>
 
 ---
+
+## Harness templates
+
+The built-in bilingual template catalog describes the required inputs and expected outputs of each workflow. Templates open in a separate editor tab, and templates with demo variants can be tried using sample inputs. The visual editor supports undo/redo, node navigation and inspection of execution results.
+
+| Template | Input | Output |
+| :--- | :--- | :--- |
+| **Invoices to Excel and PDF** | Workspace, tool-capable model and PDF paths (selectable text required) | Excel spreadsheet and PDF summary with totals by currency and exceptions |
+| **Fix a failing check** | Git workspace, bug description and verification command | Check results and Git diff for approval; up to three repair attempts |
+| **Inspect a binary** | Local PE, ELF or Mach-O file and tool-capable model | PDF inventory of format, architecture, sections, available symbols and relevant strings |
+| **Review a repository with a swarm** | Repository and optional area of focus | Prioritized PDF report with file references and swarm-board transcript |
+
+### Data and document workflows
+
+Harnesses can also transform JSON using JSON Pointer paths, select or rename fields, generate Excel (.xlsx), CSV, Word (.docx) and PDF files, and read text from supported document formats. Document nodes work with workspace-relative paths and can pass generated file paths to downstream nodes. Use `{{run_id}}` in output paths to distinguish files created by different runs.
 
 ## Headless CLI & Web Server
 
@@ -125,7 +161,7 @@ Download the latest installer for your operating system from [**GitHub Releases*
 - **macOS**: `Loors_*_aarch64.dmg`
 - **Linux**: `Loors_*.AppImage` or `.deb`
 
-> **Windows signing notice:** The current Windows installers and Loors executable are unsigned. Microsoft Defender SmartScreen may show an unknown publisher warning, and Smart App Control on Windows 11 may block installation or launch.
+> **Windows signing notice:** The release pipeline supports SignPath signing when configured. Check the digital signature of the installer you download. Unsigned builds may trigger Microsoft Defender SmartScreen warnings or be blocked by Smart App Control on Windows 11.
 
 On first launch, choose either:
 1. **100% Local AI** — Click **"Install llama.cpp automatically (1 click)"** to detect your GPU and download the inference engine, then download or reuse any GGUF model.
@@ -142,7 +178,7 @@ On first launch, choose either:
 
 ### Development
 ```bash
-npm install
+npm ci
 npm run tauri dev
 ```
 
@@ -232,4 +268,4 @@ You can also support Loors for free by starring the repository, reporting bugs, 
 
 Loors is licensed under the [Functional Source License, Version 1.1, MIT Future License (FSL-1.1-MIT)](LICENSE).
 
-You are free to use, modify, and self-host Loors for personal, internal business, educational, and non-competing purposes. Offering Loors (or a derivative) as a competing commercial product or hosted service requires a commercial license. Each version automatically converts to the MIT License two years after its release.
+Loors is **source-available**, not currently distributed under an unrestricted open-source license. The FSL permits use, modification, self-hosting and redistribution for non-competing purposes, subject to its terms, including internal business use and specified educational, research and professional-service uses. Competing commercial products or services are restricted under the FSL. Each version is additionally available under the MIT License starting two years after that version is made available. See the full [LICENSE](LICENSE) for the governing terms.
