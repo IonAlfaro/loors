@@ -268,7 +268,7 @@ interface GraphStoreState {
   clearLogs: () => void;
   clearPendingGate: () => void;
   newWorkflow: () => void;
-  loadTemplate: (templateId: string) => void;
+  loadTemplate: (templateId: string, useDemo?: boolean) => void;
   prepareRun: () => void;
   applyEngineEvent: (event: EngineEvent & { tabId?: string }) => void;
   onNodesChange: (changes: NodeChange<LoorsFlowNode>[]) => void;
@@ -1265,7 +1265,7 @@ export const useGraphStore = create<GraphStoreState>((set, get) => ({
     });
   },
 
-  loadTemplate: (templateId) => {
+  loadTemplate: (templateId, useDemo = false) => {
     const tpl = HARNESS_TEMPLATES.find((t) => t.id === templateId);
     if (!tpl) return;
     const prevNodes = get().nodes;
@@ -1286,10 +1286,12 @@ export const useGraphStore = create<GraphStoreState>((set, get) => ({
     const hasRealPrevWorkspace =
       prevWorkspace.trim().length > 0 && prevWorkspace.trim() !== ".";
 
-    graphHistories.delete(get().activeHarnessTabId);
+    const graph = useDemo && tpl.demo ? tpl.demo : tpl;
+    get().createHarnessTab();
     set({
-      workflowName: tpl.name,
-      nodes: tpl.nodes.map((n) => {
+      workflowName: useDemo && tpl.demo ? `${tpl.id}-demo` : tpl.id,
+      dirty: true,
+      nodes: structuredClone(graph.nodes).map((n) => {
         const nextConfig = { ...n.data.config };
         let nextTitle = n.data.title;
         if (n.data.kind === "local_model" && effectivePrevModel) {
@@ -1304,17 +1306,13 @@ export const useGraphStore = create<GraphStoreState>((set, get) => ({
           data: { ...n.data, title: nextTitle, config: nextConfig, status: "idle" },
         };
       }),
-      edges: tpl.edges.map((e) => ({ ...e })),
-      selectedNodeId: null,
-      runStatus: "idle",
-      runSummary: null,
-      pendingGate: null,
-      harnessTabs: get().harnessTabs.map((t) =>
-        t.id === get().activeHarnessTabId
-          ? { ...t, workflowName: tpl.name, runStatus: "idle", pendingGate: null }
-          : t
-      ),
+      edges: structuredClone(graph.edges),
     });
+    set((state) => ({
+      harnessTabs: state.harnessTabs.map((tab) =>
+        tab.id === state.activeHarnessTabId ? snapshotActiveTab(state) : tab
+      ),
+    }));
   },
 
   prepareRun: () => {

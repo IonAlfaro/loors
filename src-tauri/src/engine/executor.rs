@@ -3055,7 +3055,8 @@ async fn run_node(
 
         "create_excel" | "create_csv" | "create_word" | "create_pdf" | "read_document" => {
             let workspace = effective_workspace(graph, node_map, node, ctx);
-            let path = ctx.render_template(&config_str(node, "path", ""));
+            let path_template = config_str(node, "path", "").replace("{{run_id}}", run_id);
+            let path = ctx.render_template(&path_template);
             let kind = node.data.kind.as_str();
             let result = async {
                 if kind == "read_document" {
@@ -4052,7 +4053,7 @@ mod tests {
             nodes: vec![
                 node("input", "task_input", json!({ "workspace": workspace.path() })),
                 node("excel", "create_excel", json!({
-                    "path": "datos.xlsx", "sourceTemplate": "[{\"total\":42}]"
+                    "path": "datos-{{run_id}}.xlsx", "sourceTemplate": "[{\"total\":42}]"
                 })),
                 node("reader", "read_document", json!({ "path": "{{node:excel}}" })),
                 node("csv", "create_csv", json!({
@@ -4089,6 +4090,7 @@ mod tests {
             Arc::new(move |event| captured.lock().unwrap().push(event)),
         ).await;
         assert!(matches!(outcome, RunOutcomeKind::Completed));
+        assert!(workspace.path().join("datos-document-nodes-test.xlsx").is_file());
         let events = events.lock().unwrap();
         assert!(events.iter().any(|event| matches!(event,
             EngineEvent::NodeResult { node_id, value_preview: Some(preview), .. }

@@ -71,12 +71,11 @@ export function WorkflowIoModal({ open, onClose, onNotice, onSave }: WorkflowIoM
   const filteredTemplates = useMemo(() => {
     const q = search.trim().toLowerCase();
     if (!q) return HARNESS_TEMPLATES;
-    return HARNESS_TEMPLATES.filter(
-      (tpl) =>
-        tpl.label.toLowerCase().includes(q) ||
-        tpl.name.toLowerCase().includes(q)
-    );
-  }, [search]);
+    return HARNESS_TEMPLATES.filter((tpl) => {
+      const { title, input, output } = tpl.copy[locale];
+      return [title, input, output].some((value) => value.toLowerCase().includes(q));
+    });
+  }, [locale, search]);
 
   if (!open) return null;
 
@@ -363,26 +362,37 @@ export function WorkflowIoModal({ open, onClose, onNotice, onSave }: WorkflowIoM
                   )}
                 </div>
               ) : (
-                filteredTemplates.map((tpl) => (
-                  <div key={tpl.id} className="installed-item">
-                    <div className="installed-meta">
-                      <div className="installed-name">{tpl.label}</div>
+                filteredTemplates.map((tpl) => {
+                  const { title, input, output } = tpl.copy[locale];
+                  const openTemplate = (useDemo = false) => {
+                    loadTemplate(tpl.id, useDemo);
+                    onNotice(L(`Template opened in a new tab · ${title}`, `Plantilla abierta en una pestaña nueva · ${title}`));
+                    onClose();
+                  };
+                  return (
+                    <div key={tpl.id} className="installed-item io-template">
+                      <div className="installed-meta">
+                        <div className="installed-name">{title}</div>
+                        <dl className="io-template-details">
+                          <dt>{L("Setup", "Configuración")}</dt>
+                          <dd>{input}</dd>
+                          <dt>{L("Output", "Resultado")}</dt>
+                          <dd>{output}</dd>
+                        </dl>
+                      </div>
+                      <div className="io-template-actions">
+                        {tpl.demo && (
+                          <button type="button" className="btn-secondary" onClick={() => openTemplate(true)}>
+                            {L("Try sample", "Probar ejemplo")}
+                          </button>
+                        )}
+                        <button type="button" className="btn-secondary" onClick={() => openTemplate()}>
+                          {tpl.demo ? L("Use my PDFs", "Usar mis PDF") : L("Use template", "Usar plantilla")}
+                        </button>
+                      </div>
                     </div>
-                    <button
-                      type="button"
-                      className="btn-secondary"
-                      onClick={() => {
-                        loadTemplate(tpl.id);
-                        onNotice(
-                          L(`Template loaded: ${tpl.name}`, `Plantilla cargada: ${tpl.name}`)
-                        );
-                        onClose();
-                      }}
-                    >
-                      {L("Use", "Usar")}
-                    </button>
-                  </div>
-                ))
+                  );
+                })
               )}
             </div>
           )}

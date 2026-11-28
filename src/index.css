@@ -1051,6 +1051,39 @@ dialog.loors-dialog::backdrop {
   padding: 8px 10px;
 }
 
+.io-template {
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 12px;
+}
+
+.io-template .installed-meta {
+  min-width: min(100%, 260px);
+}
+
+.io-template-details {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: 4px 8px;
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.io-template-details dt {
+  font-weight: 600;
+}
+
+.io-template-details dd {
+  margin: 0;
+}
+
+.io-template-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
 .installed-ok {
   color: #4ade80;
   flex-shrink: 0;
