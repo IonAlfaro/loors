@@ -12,6 +12,7 @@
     <img src="https://img.shields.io/badge/Rust-Backend-orange?logo=rust&logoColor=white" alt="Rust" />
     <img src="https://img.shields.io/badge/React-TypeScript-61DAFB?logo=react&logoColor=black" alt="React + TypeScript" />
     <img src="https://img.shields.io/badge/Platforms-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey" alt="Platforms" />
+    <a href="https://github.com/sponsors/IonAlfaro"><img src="https://img.shields.io/badge/Sponsor-Loors-ea4aaa?logo=githubsponsors&amp;logoColor=white" alt="Sponsor Loors" /></a>
   </p>
 
   <p>
@@ -21,7 +22,8 @@
     <a href="#installation">Installation</a> ·
     <a href="#architecture">Architecture</a> ·
     <a href="#building-from-source">Build from Source</a> ·
-    <a href="CONTRIBUTING.md">Contributing</a>
+    <a href="CONTRIBUTING.md">Contributing</a> ·
+    <a href="#support-loors">Support Loors</a>
   </p>
 </div>
 
@@ -215,6 +217,16 @@ loors/
 - Read [CONTRIBUTING.md](CONTRIBUTING.md) to get started with pull requests.
 - Please follow our [Code of Conduct](CODE_OF_CONDUCT.md).
 - To report a security issue or review our privacy & signing policy, see [SECURITY.md](SECURITY.md).
+
+## Support Loors
+
+Loors is an independent, local-first AI project. If it helps you build software, automate workflows, or run AI on your own hardware, consider supporting its development through GitHub Sponsors.
+
+Your sponsorship helps fund ongoing development, local model integrations, agent reliability, cross-platform testing, documentation, and maintenance.
+
+[**Become a sponsor on GitHub**](https://github.com/sponsors/IonAlfaro)
+
+You can also support Loors for free by starring the repository, reporting bugs, contributing improvements, or sharing the project with others. Thank you!
 
 ## License
 
