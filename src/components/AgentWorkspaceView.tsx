@@ -2159,6 +2159,32 @@ export function AgentWorkspaceView() {
               )}
 
               {error && <div className="hw-error">{error}</div>}
+              {isCurrentRunning && harnessProgress[session.id] && (
+                <div className="agent-turn-status is-running" role="status">
+                  <span className="agent-turn-status-label">{({
+                    reasoning: locale === "es" ? "Razonando" : "Reasoning",
+                    executing: locale === "es" ? "Ejecutando herramientas" : "Executing tools",
+                    verifying: locale === "es" ? "Verificando" : "Verifying",
+                    recovering: locale === "es" ? "Replanteando estrategia" : "Recovering strategy",
+                  } as Record<string, string>)[harnessProgress[session.id].phase] ?? harnessProgress[session.id].phase}</span>
+                  {harnessProgress[session.id].task_title && (
+                    <span className="agent-turn-status-detail" title={harnessProgress[session.id].task_title ?? undefined}>
+                      {harnessProgress[session.id].task_title}
+                    </span>
+                  )}
+                </div>
+              )}
+              {!isCurrentRunning && turnOutcomes[session.id] && turnOutcomes[session.id].status !== "completed" && (
+                <div className="agent-turn-status" role="status">
+                  <strong>{({
+                    incomplete: locale === "es" ? "Trabajo incompleto" : "Incomplete work",
+                    cancelled: locale === "es" ? "Cancelado" : "Cancelled",
+                    step_limit: locale === "es" ? "Límite de iteraciones" : "Iteration limit",
+                    error: locale === "es" ? "Error de ejecución" : "Execution error",
+                  } as Record<string, string>)[turnOutcomes[session.id].status] ?? turnOutcomes[session.id].status}</strong>
+                  {turnOutcomes[session.id].summary && <span>{turnOutcomes[session.id].summary}</span>}
+                </div>
+              )}
             </div>
           </div>
 
@@ -2445,37 +2471,8 @@ export function AgentWorkspaceView() {
               />
               <AgentComposerAttachments pendingAttachments={pendingAttachments} pinnedFiles={session.pinnedFiles} stagingFiles={!!stagingFiles} locale={locale} onRemove={att => setPendingAttachments(prev => prev.filter(x => x !== att))} onUnpin={rel => void togglePinFile(rel)} />
 
-              {isCurrentRunning && harnessProgress[session.id] && (
-                <div role="status" style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 12, padding: "6px 0" }}>
-                  <span>{({
-                    reasoning: locale === "es" ? "Razonando" : "Reasoning",
-                    executing: locale === "es" ? "Ejecutando herramientas" : "Executing tools",
-                    verifying: locale === "es" ? "Verificando" : "Verifying",
-                    recovering: locale === "es" ? "Replanteando estrategia" : "Recovering strategy",
-                  } as Record<string, string>)[harnessProgress[session.id].phase] ?? harnessProgress[session.id].phase}</span>
-                  {harnessProgress[session.id].task_title && (
-                    <span title={harnessProgress[session.id].task_title ?? undefined}
-                      style={{ flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                      {harnessProgress[session.id].task_title}
-                    </span>
-                  )}
-                </div>
-              )}
-              {!isCurrentRunning && turnOutcomes[session.id] && (
-                <div role="status" style={{ fontSize: 12, padding: "6px 0", overflowWrap: "anywhere" }}>
-                  <strong>{({
-                    completed: locale === "es" ? "Turno completado" : "Turn completed",
-                    incomplete: locale === "es" ? "Trabajo incompleto" : "Incomplete work",
-                    cancelled: locale === "es" ? "Cancelado" : "Cancelled",
-                    step_limit: locale === "es" ? "Límite de iteraciones" : "Iteration limit",
-                    error: locale === "es" ? "Error de ejecución" : "Execution error",
-                  } as Record<string, string>)[turnOutcomes[session.id].status] ?? turnOutcomes[session.id].status}</strong>
-                  {turnOutcomes[session.id].summary && <div>{turnOutcomes[session.id].summary}</div>}
-                </div>
-              )}
               {!isCurrentRunning && (
                 <AgentExecutionCheckpoint checkpoint={session.executionCheckpoint} workspace={session.workspace}
-                  showOutcome={!turnOutcomes[session.id]}
                   locale={locale} disabled={!session.modelPath || Boolean(input.trim()) || pendingAttachments.length > 0}
                   onContinue={(command) => void sendTurn(command, false, [])} />
               )}

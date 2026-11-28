@@ -10389,6 +10389,35 @@ button.log-node-link {
 
 .agent-workspace-root .floating-composer textarea::placeholder { color: var(--muted); }
 
+.agent-workspace-root .agent-turn-status {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 0 auto 10px;
+  max-width: 760px;
+  padding: 0 4px;
+  color: var(--text-muted);
+  font-size: 12px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.agent-workspace-root .agent-turn-status.is-running {
+  color: var(--text-secondary);
+}
+
+.agent-workspace-root .agent-turn-status-label {
+  flex: 0 0 auto;
+}
+
+.agent-workspace-root .agent-turn-status-detail {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-muted);
+}
+
 .agent-workspace-root .composer-send-btn:not(.is-stop):enabled {
   background: var(--studio-accent);
   color: var(--studio-accent-ink);
