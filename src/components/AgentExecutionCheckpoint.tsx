@@ -3,7 +3,6 @@ type Props = {
   workspace: string;
   locale: string;
   disabled: boolean;
-  showOutcome: boolean;
   onContinue: (command: string) => void;
 };
 
@@ -12,7 +11,7 @@ function object(value: unknown): Record<string, unknown> | undefined {
     ? value as Record<string, unknown> : undefined;
 }
 
-export function AgentExecutionCheckpoint({ checkpoint, workspace, locale, disabled, showOutcome, onContinue }: Props) {
+export function AgentExecutionCheckpoint({ checkpoint, workspace, locale, disabled, onContinue }: Props) {
   const data = object(checkpoint);
   const plan = object(data?.plan);
   if (data?.version !== 1 || data.workspace !== workspace || !Array.isArray(plan?.tasks)) return null;
@@ -22,7 +21,6 @@ export function AgentExecutionCheckpoint({ checkpoint, workspace, locale, disabl
   const approval = data.awaitingApproval === true;
   const es = locale === "es";
   const telemetry = object(data.telemetry);
-  const outcome = object(data.outcome);
   const counters = [
     [es ? "Recuperaciones" : "Recoveries", telemetry?.recoveries, telemetry?.recoveryLimit],
   ] as const;
@@ -41,18 +39,6 @@ export function AgentExecutionCheckpoint({ checkpoint, workspace, locale, disabl
           && Number.isFinite(used) && Number.isFinite(limit)
           ? <span key={label}>{label}: {used}/{limit}</span> : null)}
       </div>}
-      {showOutcome && outcome && typeof outcome.status === "string" && (
-        <div role="status" style={{ fontSize: 12, overflowWrap: "anywhere" }}>
-          <strong>{({
-            completed: es ? "Turno completado" : "Turn completed",
-            incomplete: es ? "Trabajo incompleto" : "Incomplete work",
-            cancelled: es ? "Cancelado" : "Cancelled",
-            step_limit: es ? "Límite de iteraciones" : "Iteration limit",
-            error: es ? "Error de ejecución" : "Execution error",
-          } as Record<string, string>)[outcome.status] ?? outcome.status}</strong>
-          {typeof outcome.summary === "string" && outcome.summary && <div>{outcome.summary}</div>}
-        </div>
-      )}
       <details open={approval}>
         <summary>{es ? "Tareas y criterios" : "Tasks and criteria"}</summary>
         <ol style={{ maxHeight: 220, overflowY: "auto", paddingLeft: 24 }}>
