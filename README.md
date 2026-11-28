@@ -25,12 +25,6 @@
   </p>
 </div>
 
----
-
-<p align="center">
-  <img src="docs/screenshots/harness-studio.png" alt="Loors Visual Harness Studio" width="100%" />
-</p>
-
 ## Why Loors?
 
 Most AI tools force you to choose between a simple chat window and brittle CLI scripts — or lock you into a single cloud provider. **Loors** brings desktop polish, visual cyclic harnesses, an interactive shared browser, and a headless server binary together in a lightweight native stack (~4.4 MB desktop installer):
@@ -59,21 +53,15 @@ Most AI tools force you to choose between a simple chat window and brittle CLI s
 ## Screenshots
 
 ### Agent Mode
-Autonomous coding, research, and interactive browser workflows with 4-tier permissions and 1-click local or cloud setup.
+A focused workspace for starting agent conversations, choosing a model, and opening a project.
 <p align="center">
   <img src="docs/screenshots/agent-mode.png" alt="Loors Agent Mode" width="100%" />
 </p>
 
 ### Visual Harness Studio
-Design cyclic, self-healing multi-agent pipelines with live inspection, variable chips, and an integrated AI Architect.
+Build cyclic workflows on a visual canvas, connect agent and test nodes, and inspect the harness setup.
 <p align="center">
   <img src="docs/screenshots/harness-studio.png" alt="Loors Visual Harness Studio" width="100%" />
-</p>
-
-### Unified Settings & API Discovery
-Manage local GGUF models, dynamic Hugging Face downloads, MCP servers, `llama.cpp` runtimes, and cloud/local APIs in one place.
-<p align="center">
-  <img src="docs/screenshots/settings-apis.png" alt="Loors Settings" width="100%" />
 </p>
 
 ---
